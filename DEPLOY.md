@@ -12,31 +12,31 @@
 
 ## 部署方式
 
-### 方式一：GitHub 一键部署
+### 方式一：GitHub 一键部署（推荐）
 
 1. **Fork 仓库**：
-   - 访问 [GitHub 仓库](https://github.com/yourusername/emby-proxy-worker)（请替换为实际仓库地址）
-   - 点击 "Fork" 按钮创建自己的副本
+   - 访问 [GitHub 仓库](https://github.com/Dirige/EMBY_CF)
+   - 点击 "Fork"（派生）按钮创建自己的副本
 
 2. **配置 Cloudflare API 令牌**：
-   - 登录 Cloudflare 控制台
-   - 点击右上角头像 → "My Profile" → "API Tokens"
-   - 点击 "Create Token"
-   - 选择 "Edit Cloudflare Workers"
-   - 按照提示创建 API 令牌并保存
+   - 登录 [Cloudflare 控制台](https://dash.cloudflare.com/)
+   - 点击右上角头像 → "My Profile"（我的资料）→ "API Tokens"（API令牌）
+   - 点击 "Create Token"（创建令牌）
+   - 选择 "Edit Cloudflare Workers"（编辑CloudflareWorkers）
+   - 设置权限后点击 "Create Token"（创建令牌）并保存令牌值
 
 3. **配置仓库 Secrets**：
-   - 在你的 GitHub 仓库中，点击 "Settings" → "Secrets and variables" → "Actions"
-   - 点击 "New repository secret"
+   - 在你的 GitHub 仓库中，点击 "Settings"（设置）→ "Secrets and variables"（秘密和变量）→ "Actions"（操作）
+   - 点击 "New repository secret"（新建仓库密钥）
    - 添加以下 Secrets：
      - `CLOUDFLARE_API_TOKEN`：你的 Cloudflare API 令牌
-     - `CLOUDFLARE_ACCOUNT_ID`：你的 Cloudflare 账户 ID（可在 Workers 页面查看）
-     - `CLOUDFLARE_WORKER_NAME`：你想要创建的 Worker 名称（必须是小写、字母数字，只能包含破折号作为特殊字符，不能包含空格或其他特殊字符）
+     - `CLOUDFLARE_ACCOUNT_ID`：你的 Cloudflare 账户 ID（在 Cloudflare 控制台左下角查看）
+     - `CLOUDFLARE_WORKER_NAME`：你想要创建的 Worker 名称（小写字母、数字和破折号）
 
 4. **触发部署**：
-   - 在仓库页面，点击 "Actions"
-   - 选择 "Deploy to Cloudflare Workers"
-   - 点击 "Run workflow"
+   - 在仓库页面，点击 "Actions"（操作）标签
+   - 选择 "Deploy to Cloudflare Workers"（部署到Cloudflare Workers）
+   - 点击 "Run workflow"（运行工作流）
    - 等待部署完成
 
 5. **配置 D1 数据库**：
@@ -48,34 +48,32 @@
 #### 1. 准备工作
 
 1. 注册并登录 [Cloudflare](https://dash.cloudflare.com/) 账号
-2. 确保你有一个已验证的域名（可以使用Cloudflare提供的免费子域名）
+2. 确保你有一个已验证的域名（可以使用Cloudflare提供的免费域名）
 
 #### 2. 创建Worker
 
-1. 在Cloudflare控制台中，点击左侧菜单的 "Workers & Pages"
-2. 点击 "Create Application" 按钮
-3. 选择 "Create Worker"
-4. 为你的Worker取一个名称，然后点击 "Deploy"
-5. 部署完成后，点击 "Edit Code"
+1. 登录 Cloudflare 控制台，左侧菜单点击 "Workers & Pages"（Workers & Pages）
+2. 点击 "Create"（创建）按钮
+3. 选择 "Create Worker"（创建Worker）
+4. 为你的Worker取一个名称（例如：emby-proxy），然后点击 "Deploy"（部署）
+5. 部署完成后，点击 "Edit code"（编辑代码）
 
 #### 3. 上传代码
 
-1. 删除默认的Worker代码
+1. 在编辑器中删除默认的Worker代码
 2. 将 `worker.js` 文件中的所有内容复制粘贴到编辑框中
-3. 点击 "Save and Deploy"
+3. 点击 "Save and deploy"（保存并部署）
 
-#### 4. 配置D1数据库（可选）
+#### 4. 配置D1数据库（可选，用于统计功能）
 
 如果需要启用统计功能，需要配置D1数据库：
 
-1. 在Cloudflare控制台中，点击左侧菜单的 "Workers & Pages"
-2. 点击 "D1"
-3. 点击 "Create Database"
-4. 为数据库取一个名称，然后点击 "Create"
-5. 等待数据库创建完成后，点击数据库名称进入详情页
-6. 在 "Query" 标签页中，执行以下SQL语句创建表：
-
-**注意：只复制下面的SQL语句，不要包括```sql和```标记**
+1. 在Cloudflare控制台左侧菜单点击 "Workers & Pages"（Workers & Pages）
+2. 点击 "D1"（D1 数据库）
+3. 点击 "Create"（创建）
+4. 选择 "Create a database"（创建数据库），输入数据库名称
+5. 等待数据库创建完成，点击数据库名称进入详情页
+6. 换到 "Console"（控制台）标签页，执行以下SQL语句创建表：
 
 ```sql
 CREATE TABLE IF NOT EXISTS auto_emby_daily_stats (
@@ -85,20 +83,18 @@ CREATE TABLE IF NOT EXISTS auto_emby_daily_stats (
 );
 ```
 
-**复制以上SQL语句到Query编辑器中执行**
-
-7. 回到Worker编辑页面，点击 "Settings" 标签
-8. 点击 "Variables"
-9. 点击 "Add binding"
-10. 选择 "D1 Database" 作为绑定类型
+7. 回到Worker编辑页面，点击 "Settings"（设置）标签
+8. 在左侧菜单中点击 "Bindings"（绑定）
+9. 点击 "Add binding"（添加绑定）
+10. 选择绑定类型为 "D1 Database"（D1 数据库）
 11. 变量名称填写为 `DB`
 12. 选择你刚刚创建的数据库
-13. 点击 "Save"
+13. 点击 "Save"（保存）
 
 #### 5. 配置自定义域名（可选）
 
-1. 在Worker编辑页面，点击 "Triggers" 标签
-2. 点击 "Add Custom Domain"
+1. 在Worker编辑页面，点击 "Triggers"（触发器）标签
+2. 在 "Custom Domains"（自定义域名）部分点击 "Add Custom Domain"（添加自定义域名）
 3. 输入你想使用的域名（例如：emby-proxy.example.com）
 4. 按照提示完成DNS配置
 
@@ -176,20 +172,48 @@ jobs:
 3. 如遇到问题，请检查Worker日志排查错误
 4. 定期备份D1数据库中的统计数据
 5. GitHub Actions 部署需要配置正确的 API 令牌和账户 ID
+6. Cloudflare 免费账户每天有10万次请求限制，如需更多请求请升级
 
 ## 故障排查
 
 ### 常见问题
 
-1. **无法访问Worker**：检查Worker是否已部署成功，域名是否正确配置
-2. **代理失败**：检查目标Emby服务器是否可访问，防火墙是否允许Worker的IP访问
-3. **统计功能不工作**：检查D1数据库是否正确绑定，表结构是否创建
-4. **WebSocket连接失败**：确保目标Emby服务器支持WebSocket，Worker配置正确
-5. **GitHub部署失败**：检查API令牌权限，确保账户ID正确
+1. **无法访问Worker**：
+   - 检查Worker是否已部署成功
+   - 检查自定义域名的DNS配置是否正确
+   - 确保Worker路由规则已配置
+
+2. **代理失败**：
+   - 检查目标Emby服务器是否可访问
+   - 确保防火墙允许Worker的IP访问
+   - 查看Worker日志了解具体错误信息
+
+3. **统计功能不工作**：
+   - 检查D1数据库是否正确绑定
+   - 确认数据库表结构是否创建成功
+   - 查看Worker日志检查数据库操作错误
+
+4. **WebSocket连接失败**：
+   - 确保目标Emby服务器支持WebSocket
+   - 检查Worker配置中的WebSocket代理设置
+   - 确认没有防火墙或代理阻止WebSocket连接
+
+5. **GitHub部署失败**：
+   - 检查API令牌是否有效且权限足够
+   - 确保账户ID正确（在Cloudflare控制台左下角查看）
+   - 检查Worker名称格式是否符合规则（小写字母、数字、破折号）
 
 ### 查看日志
 
-在Worker编辑页面，点击 "Logs" 标签可以查看实时日志，帮助排查问题。
+1. **在线查看**：
+   - 登录 Cloudflare 控制台
+   - 进入Worker详情页
+   - 点击 "Logs"（日志）标签查看实时日志
+
+2. **本地查看**（需要安装 Wrangler CLI）：
+   ```bash
+   wrangler tail --format pretty
+   ```
 
 ## 更新日志
 
