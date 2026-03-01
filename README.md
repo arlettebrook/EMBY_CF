@@ -26,7 +26,7 @@
 
 1. Fork 本仓库
 2. 配置 Cloudflare API 令牌
-3. 配置仓库 Secrets
+3. 配置仓库 Secrets（注意：Worker 名称必须是小写、字母数字，只能包含破折号作为特殊字符）
 4. 触发 GitHub Actions 工作流
 
 详细步骤请查看 [DEPLOY.md](DEPLOY.md) 文件。
@@ -67,7 +67,7 @@ https://你的worker域名/你的emby服务器地址:端口
 ├── DEPLOY.md          # 部署教程
 ├── README.md          # 项目说明
 └── .github/workflows/ # GitHub Actions 工作流
-    └── deploy.yml     # 部署配置
+    └── main.yml       # 部署配置
 ```
 
 ## 故障排查
@@ -93,9 +93,57 @@ https://你的worker域名/你的emby服务器地址:端口
 - 欢迎加入群组讨论使用问题和功能建议
 
 ## 相关服务
-- **已部署好可直接食用地址
-- **通用反代地址**：https://fd.dirige.de5.net
-- **EMOS 反代域名**：https://emos.dirige.de5.net
+- **已部署好可直接食用地址**
+- **通用反代地址**：https://fd.dirige.de5.net（可替换为您自己的域名）
+- **EMOS 反代域名**：https://emos.dirige.de5.net（可替换为您自己的域名）
+
+## EMOS 反代部署教程
+
+### 功能特性
+
+- ✅ 支持 EMOS 服务器反向代理
+- ✅ 支持 WebSocket 连接
+- ✅ 延迟检测功能
+- ✅ 智能重定向处理
+- ✅ 设备信息统计
+- ✅ 仅限中国大陆用户访问
+
+### 部署步骤
+
+1. **Fork 本仓库**
+2. **修改 emos反代.js 文件**：
+   - 修改 `target` 为您的 EMOS 服务器地址
+   - 修改 `proxyId` 和 `proxyName` 为您的信息
+   - 可根据需要调整 `imageCacheMaxAge` 缓存时间
+3. **手动部署到 Cloudflare Workers**：
+   - 登录 Cloudflare 控制台
+   - 点击 "Workers & Pages"
+   - 点击 "Create Application" → "Create Worker"
+   - 为 Worker 取一个名称（必须符合 Cloudflare 的命名要求）
+   - 部署完成后，点击 "Edit Code"
+   - 删除默认代码，将 `emos反代.js` 文件中的内容复制粘贴到编辑框
+   - 点击 "Save and Deploy"
+4. **配置自定义域名**（可选）
+
+### 注意事项
+
+- EMOS 反代默认仅限中国大陆用户访问
+- 请确保您的 EMOS 服务器地址正确配置
+- Worker 名称必须符合 Cloudflare 的命名要求（小写、字母数字、仅含破折号）
+- 可根据需要修改 `MANUAL_REDIRECT_DOMAINS` 数组，添加需要直连的域名
+
+### 使用方法
+
+访问您的 EMOS 反代域名，将会看到延迟检测页面，显示您的网络连接状态。
+
+反向代理的使用格式：
+
+```
+https://你的emos反代域名/emby
+```
+
+例如：
+- `https://emos.example.com/emby`
 
 ## 许可证
 

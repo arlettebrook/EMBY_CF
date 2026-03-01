@@ -31,7 +31,7 @@
    - 添加以下 Secrets：
      - `CLOUDFLARE_API_TOKEN`：你的 Cloudflare API 令牌
      - `CLOUDFLARE_ACCOUNT_ID`：你的 Cloudflare 账户 ID（可在 Workers 页面查看）
-     - `CLOUDFLARE_WORKER_NAME`：你想要创建的 Worker 名称
+     - `CLOUDFLARE_WORKER_NAME`：你想要创建的 Worker 名称（必须是小写、字母数字，只能包含破折号作为特殊字符，不能包含空格或其他特殊字符）
 
 4. **触发部署**：
    - 在仓库页面，点击 "Actions"
