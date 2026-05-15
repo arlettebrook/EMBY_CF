@@ -1,0 +1,18 @@
+name = "emby-proxy"
+main = "worker.js"
+compatibility_date = "2025-05-15"
+
+# 环境变量（明文，可在代码中读取）
+[vars]
+BASE_DOMAIN = "example.com"  # 修改为你的域名
+
+# D1 数据库绑定
+[[d1_databases]]
+binding = "DB"
+database_name = "emby-proxy-db"
+# database_id 会在首次部署时自动创建并填充
+
+# 注意：以下敏感变量请在部署后通过 Cloudflare Dashboard 设置
+# ADMIN_PASSWORD - 管理后台密码
+# CF_API_TOKEN - Cloudflare API Token
+# CF_ZONE_ID - Cloudflare Zone ID
