@@ -1,6 +1,6 @@
 name: Deploy to Cloudflare Workers
 
-on:
+于:
   push:
     branches:
       - main
