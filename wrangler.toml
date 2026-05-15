@@ -1,6 +1,7 @@
 name = "emby-proxy"
 main = "worker.js"
 compatibility_date = "2025-05-15"
+keep_vars = true
 
 # 环境变量（明文，可在代码中读取）
 [vars]
