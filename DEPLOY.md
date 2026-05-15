@@ -1,228 +1,305 @@
-# Cloudflare Worker Emby 反向代理部署教程
+# 🚀 部署教程 / Deployment Guide
 
-## 功能说明
-
-这是一个带有反向代理功能的Cloudflare Worker脚本，具有以下特点：
-
-- 支持Emby服务器反向代理
-- 支持WebSocket连接
-- 支持重定向处理
-- 支持D1数据库统计功能（播放次数和获取链接次数）
-- 集成了前端页面，提供使用指南
-
-## 部署方式
-
-#### 1. 准备工作
-
-1. 注册并登录 [Cloudflare](https://dash.cloudflare.com/) 账号
-2. 确保你有一个已验证的域名（可以在DNSHE中免费注册一个域名托管到Cloudflare）
-3. DNSHE地址：https://my.dnshe.com/index.php?m=domain_hub     请输入我的邀请码（ZPB06CED7F）谢谢
-
-### 方式一：GitHub 一键部署（推荐）
-
-1. **Fork 仓库**：
-   - 访问 [GitHub 仓库](https://github.com/Dirige/EMBY_CF)
-   - 点击 "Fork"按钮创建自己的副本
-
-2. **获取 Cloudflare API 令牌**：
-   - 登录 [Cloudflare 控制台](https://dash.cloudflare.com/)
-   - 点击右上角头像 → "My Profile"（配置文件）→ "API Tokens"（API令牌）
-   - 点击 "Create Token"（创建令牌）
-   - 选择模板 "Edit Cloudflare Workers"（编辑CloudflareWorkers）
-   - 设置权限后点击 "Create Token"（创建令牌）并保存令牌值
-
-3. **配置仓库 Secrets**：
-   - 在你的 GitHub 仓库中，点击 "Settings"（设置）→ "Secrets and variables"（秘密和变量）→ "Actions"（操作）
-   - 点击 "New repository secret"（新建仓库密钥）
-   - 添加以下 Secrets：
-     - `CLOUDFLARE_API_TOKEN`：你的 Cloudflare API 令牌
-     - `CLOUDFLARE_ACCOUNT_ID`：你的 Cloudflare 账户 ID（在 Cloudflare "Workers & Pages" 页面右下角）
-     - `CLOUDFLARE_WORKER_NAME`：你想要创建的 Worker 名称（小写字母、数字和破折号）
-
-4. **触发部署**：
-   - 在仓库页面，点击 "Actions"（操作）标签
-   - 选择 "Main 部署到workflow"（运行工作流）
-   - 等待部署完成
-
-5. **配置 D1 数据库**：
-   - 部署完成后，登录 Cloudflare 控制台
-   - 按照下方 "方式二" 中的步骤 3 配置 D1 数据库
-
-### 方式二：手动部署
-
-
-
-#### 1. 创建Worker
-
-1. 登录 Cloudflare 控制台，左侧菜单点击 "Workers & Pages"
-2. 点击 "Create"（创建应用程序）按钮
-3. 选择 "Create Worker"（从hello world开始）
-4. 为你的Worker取一个名称（例如：emby-proxy），然后点击 "Deploy"（部署）
-5. 部署完成后，点击 "Edit code"（编辑代码）
-
-#### 2. 上传代码
-
-1. 在编辑器中删除默认的Worker代码
-2. 将 `worker.js` 文件中的所有内容复制粘贴到编辑框中
-3. 点击 "Save and deploy"（保存并部署）
-
-#### 3. 配置D1数据库（可选，用于统计功能）
-
-如果需要启用统计功能，需要配置D1数据库：
-
-1. 在Cloudflare控制台左侧菜单点击 "Storage & databases"（存储和数据库）
-2. 点击 "D1"（D1 数据库）
-3. 选择 "Create a database"（创建数据库），输入数据库名称
-5. 等待数据库创建完成，点击数据库名称进入详情页
-6. 换到 "Console"（控制台）标签页，执行以下SQL语句创建表：
-
-```sql
-CREATE TABLE IF NOT EXISTS auto_emby_daily_stats (
-    date TEXT PRIMARY KEY,
-    playing_count INTEGER DEFAULT 0,
-    playback_info_count INTEGER DEFAULT 0
-);
-```
-
-7. 回到Worker编辑页面，点击 "Settings"（设置）标签
-8. 在左侧菜单中点击 "Bindings"（绑定）
-9. 点击 "Add binding"（添加绑定）
-10. 选择绑定类型为 "D1 Database"（D1 数据库）
-11. 变量名称填写为 `DB`
-12. 选择你刚刚创建的数据库
-13. 点击 "Save"（保存）
-
-#### 4. 配置自定义域名（可选）
-
-1. 在Worker编辑页面，点击 "Triggers"（触发器）标签
-2. 在 "Custom Domains"（自定义域名）部分点击 "Add Custom Domain"（添加自定义域名）
-3. 输入你想使用的域名（例如：emby-proxy.example.com）
-4. 按照提示完成DNS配置
-
-## 使用方法
-
-### 基本用法
-
-访问你的Worker域名，将会看到使用指南页面。
-
-反向代理的使用格式：
-
-```
-https://你的worker域名/你的emby服务器地址:端口
-```
-
-例如：
-- `https://example.com/http://emby.com`
-- `https://example.com/https://emby.com:8096`
-
-### 高级配置
-
-1. **重定向白名单**：在 `MANUAL_REDIRECT_DOMAINS` 数组中添加需要直连的域名
-2. **域名代理规则**：在 `DOMAIN_PROXY_RULES` 对象中配置被封锁域名的代理服务器
-3. **日本节点处理**：`JP_COLOS` 数组定义了日本的Cloudflare节点，来自这些节点的流量会应用特殊规则
-
-## 统计功能
-
-当启用D1数据库后，系统会自动统计：
-- 播放次数（`/Sessions/Playing` 接口调用）
-- 获取链接次数（`/PlaybackInfo` 接口调用）
-- 直接访问 /stats 端点查看最新的JSON数据
-- 数据存储：按北京时间（UTC+8）按天存储
-
-
-## GitHub 仓库结构
-
-```
-├── worker.js          # Cloudflare Worker 主脚本
-├── DEPLOY.md          # 部署教程
-├── README.md          # 项目说明
-└── .github/workflows/ # GitHub Actions 工作流
-    └── deploy.yml     # 部署配置
-```
-
-## GitHub Actions 部署配置
-
-在 `.github/workflows/deploy.yml` 文件中配置以下内容：
-
-```yaml
-name: Deploy to Cloudflare Workers
-
-on:
-  push:
-    branches: [ main ]
-  workflow_dispatch:
-
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      
-      - name: Publish to Cloudflare Workers
-        uses: cloudflare/wrangler-action@v3
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: publish worker.js --name ${{ secrets.CLOUDFLARE_WORKER_NAME }}
-```
-
-## 注意事项
-
-1. 请遵守相关法律法规，不要使用本工具进行违法活动
-2. 合理使用资源，避免过度请求导致Cloudflare限制
-3. 如遇到问题，请检查Worker日志排查错误
-4. 定期备份D1数据库中的统计数据
-5. GitHub Actions 部署需要配置正确的 API 令牌和账户 ID
-6. Cloudflare 免费账户每天有10万次请求限制，如需更多请求请升级
-
-## 故障排查
-
-### 常见问题
-
-1. **无法访问Worker**：
-   - 检查Worker是否已部署成功
-   - 检查自定义域名的DNS配置是否正确
-   - 确保Worker路由规则已配置
-
-2. **代理失败**：
-   - 检查目标Emby服务器是否可访问
-   - 确保防火墙允许Worker的IP访问
-   - 查看Worker日志了解具体错误信息
-
-3. **统计功能不工作**：
-   - 检查D1数据库是否正确绑定
-   - 确认数据库表结构是否创建成功
-   - 查看Worker日志检查数据库操作错误
-
-4. **WebSocket连接失败**：
-   - 确保目标Emby服务器支持WebSocket
-   - 检查Worker配置中的WebSocket代理设置
-   - 确认没有防火墙或代理阻止WebSocket连接
-
-5. **GitHub部署失败**：
-   - 检查API令牌是否有效且权限足够
-   - 确保账户ID正确（在Cloudflare控制台左下角查看）
-   - 检查Worker名称格式是否符合规则（小写字母、数字、破折号）
-
-### 查看日志
-
-1. **在线查看**：
-   - 登录 Cloudflare 控制台
-   - 进入Worker详情页
-   - 点击 "Logs"（日志）标签查看实时日志
-
-2. **本地查看**（需要安装 Wrangler CLI）：
-   ```bash
-   wrangler tail --format pretty
-   ```
-
-## 更新日志
-
-- **版本 2.5**：集成D1数据库统计功能，优化重定向处理，集成前端页面
-- **版本 2.0**：优化性能，修复重定向问题
-- **版本 1.0**：初始版本，基础反向代理功能
+本文档提供两种部署方式：手动部署（适合新手）和全自动部署（适合开发者）。
 
 ---
 
+## 📋 前置准备 / Prerequisites
 
-**声明**：本工具仅用于学习和研究目的，请勿用于非法用途。使用本工具产生的一切后果由使用者自行承担。
+在开始部署前，你需要准备以下内容：
+
+### 1. Cloudflare 账号
+- 注册地址：https://dash.cloudflare.com/sign-up
+- 添加你的域名（Add Site）
+- 确保域名 DNS 已切换到 Cloudflare
+
+### 2. 域名准备
+- 一个已添加到 Cloudflare 的域名，如 `example.com`
+- 确保域名状态为 **Active**（绿色勾）
+
+### 3. 获取 API Token 和 Zone ID
+
+#### 获取 Zone ID
+1. 登录 Cloudflare Dashboard
+2. 选择你的域名
+3. 在右侧 **Overview** 页面找到 **Zone ID**，点击复制
+
+#### 创建 API Token
+1. 点击右上角头像 → **My Profile**
+2. 左侧菜单选择 **API Tokens**
+3. 点击 **Create Token**
+4. 选择 **Custom token** 模板
+5. 配置权限：
+   - **Token name**: `Emby Proxy Worker`
+   - **Permissions**:
+     - Zone:Read
+     - DNS:Edit
+   - **Zone Resources**: Include - Specific zone - 你的域名
+6. 点击 **Continue to summary** → **Create Token**
+7. **立即复制并保存 Token**，关闭后无法再次查看
+
+---
+
+## 🛠️ 方式一：手动部署（推荐新手）
+
+### Step 1: 创建 Worker / Create Worker
+
+1. 登录 [Cloudflare Dashboard](https://dash.cloudflare.com)
+2. 左侧菜单点击 **Workers & Pages**
+3. 点击 **Create application**
+4. 选择 **Create Worker**
+5. 输入 Worker 名称，如 `emby-proxy`
+6. 点击 **Deploy**（先部署默认代码）
+
+### Step 2: 编辑 Worker 代码 / Edit Worker Code
+
+1. 在 Worker 详情页，点击 **Edit code**
+2. 删除左侧编辑器中的所有默认代码
+3. 复制 `src/worker.js` 的全部内容，粘贴到编辑器中
+4. 点击 **Save and deploy**
+
+### Step 3: 绑定 D1 数据库 / Bind D1 Database
+
+1. 在 Worker 详情页，点击 **Settings** 标签
+2. 左侧选择 **Variables**
+3. 向下滚动到 **D1 Database Bindings**
+4. 点击 **Add binding**
+5. 配置：
+   - **Variable name**: `DB`
+   - **D1 database**: 选择 **Create a new D1 database**
+   - **Database name**: `emby-proxy-db`
+6. 点击 **Create and bind**
+
+### Step 4: 配置环境变量 / Set Environment Variables
+
+1. 在 **Variables** 页面，点击 **Add variable**
+2. 添加以下变量：
+
+| Variable name | Value | 说明 |
+|--------------|-------|------|
+| `ADMIN_PASSWORD` | 你的管理密码 | 管理后台登录密码 |
+| `CF_API_TOKEN` | 刚才创建的 API Token | 用于自动 DNS 管理 |
+| `CF_ZONE_ID` | 你的 Zone ID | 域名 Zone ID |
+| `BASE_DOMAIN` | `example.com` | 你的基础域名 |
+
+3. 点击 **Save**
+
+### Step 5: 配置路由 / Configure Routes
+
+1. 在 Worker 详情页，点击 **Triggers** 标签
+2. 向下滚动到 **Routes**
+3. 点击 **Add route**
+4. 添加以下路由（将 `example.com` 替换为你的域名）：
+
+```
+proxy.example.com/*
+*.proxy.example.com/*
+proxy1.example.com/*
+proxy2.example.com/*
+proxy3.example.com/*
+proxy4.example.com/*
+proxy5.example.com/*
+proxy6.example.com/*
+proxy7.example.com/*
+proxy8.example.com/*
+proxy9.example.com/*
+proxy10.example.com/*
+proxy11.example.com/*
+proxy12.example.com/*
+```
+
+5. 每条路由的 **Environment** 选择 **Production**
+6. 点击 **Add route**
+
+### Step 6: 创建 DNS 记录 / Create DNS Records
+
+Worker 会在首次请求时自动创建 DNS 记录，但你也可以手动创建：
+
+1. 进入你的域名 **DNS** 页面
+2. 添加以下 CNAME 记录：
+
+| Type | Name | Target | Proxy status |
+|------|------|--------|--------------|
+| CNAME | proxy | your-worker-name.your-subdomain.workers.dev | Proxied |
+| CNAME | proxy1 | cf.090227.xyz | Proxied |
+| CNAME | proxy2 | cf.877774.xyz | Proxied |
+| CNAME | proxy3 | cloudflare-dl.byoip.top | Proxied |
+| CNAME | proxy4 | saas.sin.fan | Proxied |
+| CNAME | proxy5 | bestcf.030101.xyz | Proxied |
+| CNAME | proxy6 | cf.cloudflare.182682.xyz | Proxied |
+| CNAME | proxy7 | cf.tencentapp.cn | Proxied |
+| CNAME | proxy8 | www.visa.cn | Proxied |
+| CNAME | proxy9 | mfa.gov.ua | Proxied |
+| CNAME | proxy10 | www.shopify.com | Proxied |
+| CNAME | proxy11 | store.ubi.com | Proxied |
+| CNAME | proxy12 | staticdelivery.nexusmods.com | Proxied |
+
+**注意**：所有记录的 **Proxy status** 必须是 **Proxied**（橙色云）。
+
+### Step 7: 测试部署 / Test Deployment
+
+1. 访问 `https://proxy.example.com/`
+2. 应该看到首页和统计信息
+3. 访问 `https://proxy.example.com/admin`
+4. 使用 `ADMIN_PASSWORD` 登录管理后台
+5. 尝试访问 `https://proxy.example.com/your-emby-server.com`
+
+---
+
+## 🤖 方式二：全自动部署（推荐开发者）
+
+### Step 1: 安装 Wrangler CLI
+
+```bash
+# 使用 npm 安装
+npm install -g wrangler
+
+# 或使用 yarn
+yarn global add wrangler
+```
+
+### Step 2: 登录 Cloudflare
+
+```bash
+wrangler login
+```
+
+浏览器会打开授权页面，点击 **Allow** 授权。
+
+### Step 3: 克隆项目并配置
+
+```bash
+# 克隆仓库
+git clone https://github.com/yourusername/emby-proxy-worker.git
+cd emby-proxy-worker
+
+# 复制配置文件模板
+cp wrangler.toml.example wrangler.toml
+```
+
+编辑 `wrangler.toml`：
+
+```toml
+name = "emby-proxy"
+main = "src/worker.js"
+compatibility_date = "2025-05-15"
+
+# 环境变量
+[vars]
+BASE_DOMAIN = "example.com"  # 修改为你的域名
+
+# 密钥（部署时会提示输入）
+[[env.production.vars]]
+ADMIN_PASSWORD = ""
+CF_API_TOKEN = ""
+CF_ZONE_ID = ""
+
+# D1 数据库绑定
+[[d1_databases]]
+binding = "DB"
+database_name = "emby-proxy-db"
+database_id = ""  # 部署后自动填充
+```
+
+### Step 4: 运行自动部署脚本
+
+```bash
+chmod +x scripts/deploy.sh
+./scripts/deploy.sh
+```
+
+脚本会执行以下操作：
+1. 创建 D1 数据库
+2. 部署 Worker
+3. 设置环境变量
+4. 配置路由
+5. 自动创建 DNS 记录
+
+### Step 5: 验证部署
+
+```bash
+# 测试首页
+curl https://proxy.example.com/
+
+# 测试管理后台
+curl https://proxy.example.com/admin
+
+# 测试智能选线
+curl -v https://proxy.example.com/your-emby-server.com
+```
+
+---
+
+## 🔧 故障排查 / Troubleshooting
+
+### 问题 1: Worker 返回 404
+
+**原因**: 路由配置不正确
+
+**解决**:
+1. 检查 Worker Routes 是否包含 `proxy.example.com/*`
+2. 确保 DNS 记录的 Proxy status 是 **Proxied**
+
+### 问题 2: DNS 记录未自动创建
+
+**原因**: API Token 权限不足或环境变量未设置
+
+**解决**:
+1. 检查 `CF_API_TOKEN` 是否有 `DNS:Edit` 权限
+2. 检查 `CF_ZONE_ID` 是否正确
+3. 查看 Worker Logs 中的错误信息
+
+### 问题 3: 智能选线不生效
+
+**原因**: 缓存未命中或测速失败
+
+**解决**:
+1. 首次访问会显示测速页面，等待测速完成
+2. 检查浏览器控制台是否有报错
+3. 查看 `/admin` 中的缓存状态
+
+### 问题 4: D1 数据库报错
+
+**原因**: 数据库绑定不正确
+
+**解决**:
+1. 检查 Worker Settings → Variables → D1 Database Bindings
+2. 确保 Variable name 是 `DB`
+3. 尝试重新绑定数据库
+
+---
+
+## 📝 部署后配置 / Post-Deployment
+
+### 1. 修改默认密码
+
+首次部署后，立即修改 `ADMIN_PASSWORD`：
+1. 进入 Worker Settings → Variables
+2. 编辑 `ADMIN_PASSWORD`
+3. 点击 **Save**
+
+### 2. 创建别名（可选）
+
+访问 `https://proxy.example.com/admin`，创建别名快捷入口：
+1. 点击 **添加别名组**
+2. 输入关键字（如 `mir`）
+3. 添加线路（Emby 服务器地址）
+4. 保存后可通过 `https://mir.example.com` 访问
+
+### 3. 监控统计
+
+访问 `https://proxy.example.com/stats` 查看：
+- 总播放次数
+- 总获取链接次数
+- 最近 10 天每日统计
+
+---
+
+## 🎉 恭喜！
+
+你的 Emby Proxy Worker 已经部署完成！
+
+**下一步**:
+- 阅读 [CONFIG.md](./CONFIG.md) 了解详细配置
+- 阅读 [API.md](./API.md) 了解 API 接口
+- 在 GitHub 上 Star 本项目 ⭐

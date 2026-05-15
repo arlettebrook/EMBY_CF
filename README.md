@@ -1,103 +1,161 @@
-# Cloudflare Worker Emby 反向代理
+# Emby Proxy Worker
 
-一个功能强大的 Cloudflare Worker 反向代理脚本，专为 Emby 服务器设计，支持 WebSocket 连接和 D1 数据库统计功能。
+一个功能强大的 Cloudflare Worker 反向代理解决方案，专为 Emby 媒体服务器优化，支持智能选线、D1 统计、别名快捷入口和多线路负载均衡。
 
-## 功能特性
+## ✨ 主要功能
 
-- ✅ 支持 Emby 服务器反向代理
-- ✅ 支持 WebSocket 连接
-- ✅ 智能重定向处理
-- ✅ D1 数据库统计功能
-- ✅ 集成前端使用指南
-- ✅ 支持自定义域名
-- ✅ 一键部署到 Cloudflare Workers
+### 🚀 核心代理功能
+- **通用反向代理**：支持任意 HTTP/HTTPS 网站的反向代理
+- **Emby 优化**：针对 Emby 媒体服务器的特殊优化
+- **流式传输**：支持大文件流式传输，不占用 Worker 内存
+- **WebSocket 支持**：完整的 WebSocket 代理能力
 
-## 统计功能
+### 🎯 智能选线系统
+- **自动测速**：用户首次访问时自动测试多条优选线路
+- **地区缓存**：按用户地区（国家）和运营商（ASN）缓存最优线路
+- **智能重定向**：缓存命中时自动 302 重定向到最优线路
+- **12 条优选线路**：内置 12 条 Cloudflare 优选域名
 
-- **播放次数**：记录 `/Sessions/Playing` 接口调用
-- **获取链接次数**：记录 `/PlaybackInfo` 接口调用
-- **直接访问 `/stats` 端点查看最新的统计数据**
-- **数据存储**：按北京时间（UTC+8）按天存储
-- **数据展示**：在前端页面实时显示统计数据
+### 📊 D1 统计系统
+- **播放统计**：记录 `/Sessions/Playing` 播放次数
+- **链接统计**：记录 `/PlaybackInfo` 获取链接次数
+- **按天统计**：支持查看最近 30 天的统计数据
+- **北京时间**：所有统计时间使用北京时间（UTC+8）
 
-## 部署方式
+### 🎭 别名快捷入口系统
+- **URL Rewrite**：支持 `/alias` 格式的快捷访问
+- **多线路支持**：每个别名可配置多条后端线路
+- **加权随机**：根据权重智能选择线路
+- **自动故障转移**：线路故障时自动切换到备用线路
+- **健康检测**：支持手动和自动线路健康检测
 
-### 方式一：Cloudflare 一键部署
+### 🛠️ 管理后台
+- **Web 管理面板**：完整的后台管理界面（`/admin`）
+- **别名管理**：创建、编辑、删除别名和线路
+- **DNS 自动管理**：创建别名时自动添加 DNS CNAME 记录
+- **线路监控**：查看线路健康状态和延迟
 
-1. Fork 本仓库
-2. 配置 Cloudflare API 令牌
-3. 配置仓库 Secrets
-4. 触发 GitHub Actions 工作流
-
-详细步骤请查看 [DEPLOY.md](DEPLOY.md) 文件。
-
-### 方式二：手动部署
-
-1. 在 Cloudflare 控制台创建 Worker
-2. 上传 `worker.js` 代码
-3. 配置 D1 数据库（可选）
-4. 配置自定义域名（可选）
-
-详细步骤请查看 [DEPLOY.md](DEPLOY.md) 文件。
-
-## 使用方法
-
-访问你的 Worker 域名，将会看到使用指南页面。
-
-反向代理的使用格式：
+## 📁 项目结构
 
 ```
-https://你的worker域名/你的emby服务器地址:端口
+emby-proxy-worker/
+├── src/
+│   └── worker.js          # 主 Worker 脚本
+├── docs/
+│   ├── DEPLOY.md          # 部署教程
+│   ├── CONFIG.md          # 配置说明
+│   └── API.md             # API 文档
+├── scripts/
+│   └── deploy.sh          # 自动部署脚本
+├── wrangler.toml          # Wrangler 配置文件
+└── README.md              # 项目说明
 ```
 
-例如：
-- `https://example.com/http://emby.com`
-- `https://example.comhttps://emby.com:8096`
+## 🚀 快速开始
 
-## 高级配置
+### 方式一：手动部署（推荐新手）
 
-1. **重定向白名单**：在 `MANUAL_REDIRECT_DOMAINS` 数组中添加需要直连的域名
-2. **域名代理规则**：在 `DOMAIN_PROXY_RULES` 对象中配置被封锁域名的代理服务器
-3. **日本节点处理**：`JP_COLOS` 数组定义了日本的 Cloudflare 节点，来自这些节点的流量会应用特殊规则
+详见 [docs/DEPLOY.md](./docs/DEPLOY.md) 中的"手动部署"章节。
 
-## 项目结构
+### 方式二：全自动部署（推荐开发者）
 
+```bash
+# 1. 克隆仓库
+git clone https://github.com/yourusername/emby-proxy-worker.git
+cd emby-proxy-worker
+
+# 2. 安装依赖
+npm install -g wrangler
+
+# 3. 登录 Cloudflare
+wrangler login
+
+# 4. 运行自动部署脚本
+chmod +x scripts/deploy.sh
+./scripts/deploy.sh
 ```
-├── worker.js          # Cloudflare Worker 主脚本
-├── DEPLOY.md          # 部署教程
-├── README.md          # 项目说明
-└── .github/workflows/ # GitHub Actions 工作流
-    └── main.yml       # 部署配置
+
+## ⚙️ 环境变量配置
+
+在 Cloudflare Worker 设置中配置以下环境变量：
+
+| 变量名 | 说明 | 必需 |
+|--------|------|------|
+| `ADMIN_PASSWORD` | 管理后台密码 | ✅ |
+| `CF_API_TOKEN` | Cloudflare API Token | ✅（用于自动 DNS 管理） |
+| `CF_ZONE_ID` | Cloudflare Zone ID | ✅（用于自动 DNS 管理） |
+| `BASE_DOMAIN` | 基础域名，如 `example.com` | ✅ |
+
+## 📖 使用文档
+
+- [部署教程](./docs/DEPLOY.md) - 详细的手动和自动部署步骤
+- [配置说明](./docs/CONFIG.md) - 所有配置项的详细说明
+- [API 文档](./docs/API.md) - 管理后台 API 接口文档
+
+## 🔧 使用示例
+
+### 基础代理
+```
+https://proxy.your-domain.com/emby-server.com
+https://proxy.your-domain.com/http://emby-server.com
+https://proxy.your-domain.com/https://emby-server.com:8096
 ```
 
-## 故障排查
+### 智能选线（推荐）
+```
+https://proxy.your-domain.com/emby-server.com
+# 首次访问会自动测速，之后自动使用最优线路
+```
 
-- **无法访问 Worker**：检查 Worker 是否已部署成功，域名是否正确配置
-- **代理失败**：检查目标 Emby 服务器是否可访问，防火墙是否允许 Worker 的 IP 访问
-- **统计功能不工作**：检查 D1 数据库是否正确绑定，表结构是否创建
-- **WebSocket 连接失败**：确保目标 Emby 服务器支持 WebSocket，Worker 配置正确
+### 别名快捷访问
+```
+https://your-domain.com/mir
+# 如果创建了 mir 别名，会自动转发到配置的 Emby 服务器
+```
 
-## 更新日志
+### 管理后台
+```
+https://proxy.your-domain.com/admin
+# 使用 ADMIN_PASSWORD 登录管理后台
+```
 
-- **版本 2.5**：集成 D1 数据库统计功能，优化重定向处理，集成前端页面
-- **版本 2.0**：优化性能，修复重定向问题
-- **版本 1.0**：初始版本，基础反向代理功能
+## 🌟 优选线路列表
 
-## 声明
+智能选线系统内置 12 条 Cloudflare 优选域名：
 
-本工具仅用于学习和研究目的，请勿用于非法用途。使用本工具产生的一切后果由使用者自行承担。
+| 子域名 | 优选域名 | 说明 |
+|--------|---------|------|
+| proxy1 | cf.090227.xyz | CF优选-090227 |
+| proxy2 | cf.877774.xyz | CF优选-877774 |
+| proxy3 | cloudflare-dl.byoip.top | 鱼皮优选 |
+| proxy4 | saas.sin.fan | MIYU优选 |
+| proxy5 | bestcf.030101.xyz | Mingyu优选 |
+| proxy6 | cf.cloudflare.182682.xyz | WeTest优选 |
+| proxy7 | cf.tencentapp.cn | 腾讯泛域名 |
+| proxy8 | www.visa.cn | Visa官方 |
+| proxy9 | mfa.gov.ua | 乌克兰外交部 |
+| proxy10 | www.shopify.com | Shopify官方 |
+| proxy11 | store.ubi.com | 育碧商店 |
+| proxy12 | staticdelivery.nexusmods.com | NexusMods |
 
-## 交流反馈
+## 📝 更新日志
 
-- **反馈群组**：[https://t.me/Dirige_Proxy](https://t.me/Dirige_Proxy)
-- 欢迎加入群组讨论使用问题和功能建议
+### v3.0 (2025-05-15)
+- ✅ 新增智能选线系统
+- ✅ 新增 D1 统计功能
+- ✅ 新增别名快捷入口系统
+- ✅ 新增管理后台
+- ✅ 新增 DNS 自动管理
+- ✅ 优化代码结构，支持环境变量配置
 
-## 相关服务
-- **已部署好可直接食用地址**
-- **通用反代地址**：https://fd.dirige.de5.net    三网
-- **通用反代地址**：https://fd.255432.cc.cd      移动
-- **通用反代地址**：https://fd.255432.de5.net    联通
+## 🤝 贡献
 
-## 许可证
+欢迎提交 Issue 和 Pull Request！
+
+## 📄 许可证
 
 MIT License
+
+## 💖 致谢
+
+感谢所有开源社区提供的优选域名资源。
