@@ -449,7 +449,7 @@ async function handleSpeedReport(request, env) {
 // ===== 前端页面HTML（原始，未修改） =====
 const FRONTEND_HTML = `
 <!DOCTYPE html>
-<html>
+<html lang="zh-CN">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -457,122 +457,114 @@ const FRONTEND_HTML = `
   <link rel="icon" href="/favicon.ico" type="image/webp">
   <style>
     * { box-sizing: border-box; }
-    body { font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; line-height: 1.6; color: #e1e4e8; margin: 0; padding: 0; background-color: #1a1c22; display: flex; min-height: 100vh; }
-    .container { width: 100%; max-width: 800px; margin: auto; padding: 20px; display: flex; flex-direction: column; gap: 20px; }
-    .content-section { background: #252830; padding: 40px; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); border-top: 5px solid #0070f3; }
-    .content-section h1 { margin-top: 0; color: #0070f3; display: flex; align-items: center; }
-    h2 { color: #0070f3; border-bottom: 2px solid #3e4451; padding-bottom: 10px; margin-top: 30px; }
-    code { background: rgba(0, 112, 243, 0.1); padding: 4px 8px; border-radius: 4px; font-family: 'Fira Code', monospace; font-size: 0.9em; color: #61afef; word-break: break-all; border: 1px solid rgba(0, 112, 243, 0.2); }
-    .example-box { background: rgba(0, 112, 243, 0.05); border-left: 4px solid #0070f3; padding: 15px; margin: 15px 0; border-radius: 0 8px 8px 0; }
-    .warning { color: #e06c75; font-weight: bold; border: 2px solid rgba(224, 108, 117, 0.3); padding: 20px; border-radius: 12px; margin-top: 40px; background: rgba(224, 108, 117, 0.05); }
-    .strong-red { color: #e06c75; font-weight: 900; text-decoration: underline; font-size: 1.1em; }
-    .status-tag { display: inline-block; background: #0070f3; color: white; padding: 2px 10px; border-radius: 4px; font-weight: bold; margin-bottom: 10px; }
-    .feature-card { background: rgba(0, 112, 243, 0.1); border-radius: 8px; padding: 20px; margin: 20px 0; border-left: 4px solid #0070f3; }
-    .feature-card h3 { color: #0070f3; margin-top: 0; font-size: 1.2em; }
-    .feature-card p { margin-bottom: 0; color: #abb2bf; }
-    .footer-text { margin-top: 30px; padding-top: 20px; border-top: 1px dashed #3e4451; font-size: 0.9em; }
-    .stat-card { background: rgba(0, 112, 243, 0.1); padding: 20px; border-radius: 8px; text-align: center; flex: 1; margin: 0 10px; border: 1px solid rgba(0, 112, 243, 0.2); }
+    body { font-family: "SF Pro Display", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; line-height: 1.6; color: #f5f5f7; margin: 0; padding: 0; background-color: #000; display: flex; min-height: 100vh; }
+    .container { width: 100%; max-width: 860px; margin: auto; padding: 30px 20px; display: flex; flex-direction: column; gap: 24px; }
+    .content-section { background: #1c1c1e; padding: 40px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 1px solid #38383a; position: relative; overflow: hidden; }
+    .content-section::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, #0a84ff, #5e5ce6); }
+    .content-section h1 { margin-top: 0; color: #0a84ff; display: flex; align-items: center; font-size: 28px; font-weight: 700; }
+    h2 { color: #0a84ff; border-bottom: 1px solid #38383a; padding-bottom: 12px; margin-top: 36px; font-size: 20px; font-weight: 600; }
+    code { background: rgba(10, 132, 255, 0.15); padding: 4px 8px; border-radius: 6px; font-family: 'Fira Code', ui-monospace, monospace; font-size: 0.9em; color: #64d2ff; word-break: break-all; border: 1px solid rgba(10, 132, 255, 0.2); }
+    .example-box { background: rgba(10, 132, 255, 0.05); border-left: 4px solid #0a84ff; padding: 20px; margin: 16px 0; border-radius: 0 12px 12px 0; }
+    .warning { color: #ff453a; font-weight: 500; border: 1px solid rgba(255, 69, 58, 0.3); padding: 20px; border-radius: 12px; margin-top: 40px; background: rgba(255, 69, 58, 0.08); display: flex; align-items: flex-start; gap: 12px; }
+    .strong-red { color: #ff453a; font-weight: 700; text-decoration: underline; font-size: 1.05em; }
+    .status-tag { display: inline-block; background: linear-gradient(135deg, #0a84ff, #0061cc); color: white; padding: 4px 12px; border-radius: 20px; font-weight: 600; margin-bottom: 16px; font-size: 14px; letter-spacing: 0.5px; }
+    .feature-card { background: rgba(255, 255, 255, 0.03); border-radius: 16px; padding: 24px; margin: 20px 0; border: 1px solid #38383a; transition: transform 0.2s, background 0.2s; }
+    .feature-card:hover { transform: translateY(-2px); background: rgba(255, 255, 255, 0.05); border-color: #0a84ff; }
+    .feature-card h3 { color: #0a84ff; margin-top: 0; font-size: 18px; margin-bottom: 12px; }
+    .feature-card p { margin-bottom: 0; color: #98989d; font-size: 15px; }
+    .footer-text { margin-top: 40px; padding-top: 24px; border-top: 1px dashed #38383a; font-size: 14px; color: #98989d; text-align: center; }
+    .footer-text p { margin: 6px 0; }
+    .stat-card { background: #2c2c2e; padding: 24px; border-radius: 16px; text-align: center; flex: 1; margin: 0 8px; border: 1px solid #38383a; }
     .stat-card:first-child { margin-left: 0; }
     .stat-card:last-child { margin-right: 0; }
-    .stat-value { font-size: 2em; font-weight: bold; color: #0070f3; margin-top: 10px; }
-    #daily-stats { background: rgba(0, 0, 0, 0.2); border-radius: 8px; padding: 15px; overflow-x: auto; }
-    .stats-table { width: 100%; border-collapse: collapse; }
-    .stats-table th, .stats-table td { padding: 10px; text-align: left; border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
-    .stats-table th { background: rgba(0, 112, 243, 0.2); font-weight: bold; color: #0070f3; }
-    .stats-table tr:hover { background: rgba(0, 112, 243, 0.1); }
-    @media (max-width: 900px) { .container { padding: 10px; } .content-section { padding: 20px; } .stat-card { margin: 5px; padding: 15px; } }
+    .stat-card h3 { margin: 0; font-size: 15px; color: #98989d; font-weight: 500; }
+    .stat-value { font-size: 2.5em; font-weight: 700; color: #0a84ff; margin-top: 12px; font-family: "SF Pro Rounded", sans-serif; }
+    #daily-stats { background: #2c2c2e; border-radius: 16px; padding: 0; overflow-x: auto; border: 1px solid #38383a; margin-top: 20px; }
+    .stats-table { width: 100%; border-collapse: collapse; text-align: left; }
+    .stats-table th, .stats-table td { padding: 14px 20px; border-bottom: 1px solid #38383a; font-size: 15px; }
+    .stats-table th { background: rgba(10, 132, 255, 0.1); font-weight: 600; color: #0a84ff; text-transform: uppercase; letter-spacing: 0.5px; font-size: 13px; }
+    .stats-table tr:last-child td { border-bottom: none; }
+    .stats-table tr:hover td { background: rgba(255, 255, 255, 0.02); }
+    @media (max-width: 900px) { 
+      .container { padding: 16px; } 
+      .content-section { padding: 24px; border-radius: 16px; } 
+      .stat-card { margin: 6px 0; padding: 20px; } 
+      .stats-container { flex-direction: column; } 
+    }
   </style>
 </head>
 <body>
   <div class="container">
-    <div class="content-section" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;">
-      <h1 style="margin:0;">🚀 使用指南</h1>
-      <a href="/admin" style="background:#0070f3;color:white;padding:10px 20px;border-radius:8px;text-decoration:none;font-weight:600;">🔐 管理后台</a>
+    <div class="content-section" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap; gap: 16px;">
+      <h1 style="margin:0; font-size: 24px;">🚀 代理服务指南</h1>
+      <a href="/admin" style="background:#0a84ff;color:white;padding:10px 24px;border-radius:12px;text-decoration:none;font-weight:600;font-size:15px;transition:0.2s;box-shadow:0 4px 12px rgba(10,132,255,0.3);">🔐 管理后台</a>
     </div>
     <div class="content-section">
-      <h2>通用格式</h2>
+      <div class="status-tag">服务状态：运行中</div>
+      <h1>🔧 Emby 反向代理</h1>
+      <p style="color: #98989d; font-size: 16px; margin-bottom: 24px;">本服务提供高性能的反向代理与链路优化，支持直接路径代理与别名快捷入口系统。</p>
+      
+      <div class="feature-card">
+        <h3>✨ 别名快捷入口 (新功能)</h3>
+        <p>支持在管理后台配置别名（如将 <code>emby.example.com</code> 映射为别名 <code>myemby</code>）。<br>
+        配置后直接访问 <code>https://proxy.domain.com/myemby</code> 即可自动路由，并且支持配置多条优选线路与自动故障转移 (Failover)！</p>
+      </div>
+
+      <h2>直接路径反代示例</h2>
       <div class="example-box">
         <code id="example-format-1">https://proxy.your-domain.com/你的域名:端口</code><br>
-        <code id="example-format-2" style="display:inline-block; margin-top:8px;">https://proxy.your-domain.com/http://你的域名:端口</code><br>
-        <code id="example-format-3" style="display:inline-block; margin-top:8px;">https://proxy.your-domain.com/https://你的域名:端口</code>
+        <code id="example-format-2" style="display:inline-block; margin-top:10px;">https://proxy.your-domain.com/http://你的域名:端口</code><br>
+        <code id="example-format-3" style="display:inline-block; margin-top:10px;">https://proxy.your-domain.com/https://你的域名:端口</code>
       </div>
-      <h2>HTTP 示例</h2>
-      <div class="example-box">
-        <code id="example-http">https://proxy.your-domain.com/http://emby.com</code>
-      </div>
-      <h2>HTTPS 示例</h2>
-      <div class="example-box">
-        <code id="example-https">https://proxy.your-domain.com/https://emby.com</code>
-      </div>
+
       <div class="warning">
-        ⚠️ <strong>严正警告：</strong><br>
-        添加服后 <span class="strong-red">务必手动测试</span> 是否可用。禁止未经测试大批量添加，导致服务器报错刷屏、恶意占用资源者，<span class="strong-red">直接封禁 IP，不予通知！</span>
-      </div>
-    </div>
-    <div class="content-section">
-      <div class="status-tag">关于本服务</div>
-      <h1>🔧 Emby 反向代理</h1>
-      <p><strong>服务特点：</strong></p>
-      <ul style="list-style-type: disc; padding-left: 20px; color: #abb2bf;">
-        <li>高速稳定的反向代理服务</li>
-        <li>支持 WebSocket 连接</li>
-        <li>智能重定向处理</li>
-        <li>详细的使用统计</li>
-        <li>全球节点覆盖</li>
-      </ul>
-      <div class="feature-card">
-        <h3>📊 统计功能</h3>
-        <p>本服务集成了 D1 数据库统计功能，可以记录播放次数和获取链接次数，帮助您了解服务使用情况。</p>
-      </div>
-      <div class="feature-card">
-        <h3>🌍 全球节点</h3>
-        <p>利用 Cloudflare 全球 CDN 网络，为您提供就近的访问节点，确保最佳的访问速度。</p>
-      </div>
-      <div class="content-section" id="stats-section">
-        <h2>📈 使用统计</h2>
-        <div id="stats-loading">加载统计数据中...</div>
-        <div id="stats-error" style="display: none; color: #e06c75;"></div>
-        <div id="stats-content" style="display: none;">
-          <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
-            <div class="stat-card">
-              <h3>总播放次数</h3>
-              <div id="total-playing" class="stat-value">0</div>
-            </div>
-            <div class="stat-card">
-              <h3>总获取链接次数</h3>
-              <div id="total-playback-info" class="stat-value">0</div>
-            </div>
-          </div>
-          <div style="margin-bottom: 20px; color: #666; font-size: 14px;">
-            <p>备注：以上统计数据为最近30天的累计数据</p>
-          </div>
-          <h3>每日统计</h3>
-          <div style="margin-bottom: 10px; color: #666; font-size: 14px;">
-            <p>备注：每日统计显示最近10天的数据</p>
-          </div>
-          <div id="daily-stats"></div>
-          <div class="footer-text" style="margin-top: 20px;">
-            <p>数据更新时间: <span id="last-updated">--</span></p>
-            <p>每小时自动更新</p>
-          </div>
+        <div style="font-size: 24px;">⚠️</div>
+        <div>
+          <strong>严正警告：</strong><br>
+          <span style="color: #98989d; font-size: 14px; display: inline-block; margin-top: 6px;">
+            添加服务后 <span class="strong-red">务必手动测试</span> 是否可用。禁止未经测试大批量添加，导致服务器报错刷屏、恶意占用资源者，<span class="strong-red">直接封禁 IP，不予通知！</span>
+          </span>
         </div>
       </div>
-      <div class="footer-text">
-        <p>© 2026 Emby 反向代理服务</p>
-        <p>本服务仅用于学习和研究目的</p>
-        <p>交流反馈群组: <a href="https://t.me/Dirige_Proxy" target="_blank" style="color: #0070f3; text-decoration: none;">https://t.me/Dirige_Proxy</a></p>
+    </div>
+    <div class="content-section" id="stats-section">
+      <h2>📈 使用统计</h2>
+      <div id="stats-loading" style="color: #98989d; text-align: center; padding: 40px 0;">正在获取最新统计数据...</div>
+      <div id="stats-error" style="display: none; color: #ff453a; text-align: center; padding: 40px 0; background: rgba(255,69,58,0.08); border-radius: 12px; margin-top: 20px;"></div>
+      <div id="stats-content" style="display: none;">
+        <div class="stats-container" style="display: flex; justify-content: space-between; margin-bottom: 24px; gap: 16px;">
+          <div class="stat-card">
+            <h3>总播放次数</h3>
+            <div id="total-playing" class="stat-value">0</div>
+          </div>
+          <div class="stat-card">
+            <h3>总获取链接次数</h3>
+            <div id="total-playback-info" class="stat-value">0</div>
+          </div>
+        </div>
+        <p style="color: #98989d; font-size: 14px; margin-bottom: 24px;">💡 以上为最近 30 天的累计数据。</p>
+        
+        <h3 style="color: #0a84ff; font-size: 18px; margin-bottom: 12px;">每日详细统计</h3>
+        <p style="color: #98989d; font-size: 14px;">💡 仅显示最近 10 天的数据记录。</p>
+        <div id="daily-stats"></div>
+        
+        <div class="footer-text" style="margin-top: 30px; display: flex; justify-content: space-between; align-items: center; border-top: none; padding-top: 0;">
+          <span style="background: rgba(255,255,255,0.05); padding: 6px 12px; border-radius: 8px;">数据更新时间: <strong id="last-updated" style="color: #f5f5f7;">--</strong></span>
+          <span>每小时自动刷新</span>
+        </div>
       </div>
+    </div>
+    <div class="footer-text" style="margin-top: 10px; border-top: none;">
+      <p>© 2026 Emby 反向代理服务 | 仅用于学习和研究目的</p>
+      <p>交流反馈: <a href="https://t.me/Dirige_Proxy" target="_blank" style="color: #0a84ff; text-decoration: none; font-weight: 500;">https://t.me/Dirige_Proxy</a></p>
     </div>
   </div>
   <script>
-    // 获取当前域名用于显示示例
     var currentDomain = window.location.hostname;
     if (currentDomain && currentDomain !== 'localhost' && !currentDomain.includes('your-domain')) {
       document.getElementById('example-format-1').textContent = 'https://' + currentDomain + '/你的域名:端口';
       document.getElementById('example-format-2').textContent = 'https://' + currentDomain + '/http://你的域名:端口';
       document.getElementById('example-format-3').textContent = 'https://' + currentDomain + '/https://你的域名:端口';
-      document.getElementById('example-http').textContent = 'https://' + currentDomain + '/http://emby.com';
-      document.getElementById('example-https').textContent = 'https://' + currentDomain + '/https://emby.com';
     }
 
     async function fetchStats() {
@@ -599,7 +591,7 @@ const FRONTEND_HTML = `
           tableHTML += '</tbody></table>';
           dailyStatsContainer.innerHTML = tableHTML;
         } else {
-          dailyStatsContainer.innerHTML = '<p>暂无统计数据</p>';
+          dailyStatsContainer.innerHTML = '<div style="padding: 30px; text-align: center; color: #98989d;">暂无统计数据</div>';
         }
         document.getElementById('stats-loading').style.display = 'none';
         document.getElementById('stats-error').style.display = 'none';
@@ -1922,9 +1914,78 @@ async function handleStatsRequest(env) {
      }
  }
 
+let dbInitialized = false;
+
+async function autoInitDB(env) {
+    if (!env.DB || dbInitialized) return;
+    try {
+        // 1. 统计表
+        await env.DB.prepare(`CREATE TABLE IF NOT EXISTS emby_stats (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            date TEXT UNIQUE NOT NULL,
+            playing_count INTEGER DEFAULT 0,
+            playback_info_count INTEGER DEFAULT 0
+        )`).run();
+        // 2. 别名节点表
+        await env.DB.prepare(`CREATE TABLE IF NOT EXISTS alias_nodes (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            keyword TEXT UNIQUE NOT NULL,
+            remark TEXT,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        )`).run();
+        // 3. 别名线路表
+        await env.DB.prepare(`CREATE TABLE IF NOT EXISTS alias_lines (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            node_id INTEGER NOT NULL,
+            origin TEXT NOT NULL,
+            weight INTEGER DEFAULT 1,
+            enabled INTEGER DEFAULT 1,
+            healthy INTEGER DEFAULT 1,
+            latency INTEGER DEFAULT 0,
+            fail_count INTEGER DEFAULT 0,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (node_id) REFERENCES alias_nodes(id) ON DELETE CASCADE
+        )`).run();
+        // 4. 智能选线缓存表
+        await env.DB.prepare(`CREATE TABLE IF NOT EXISTS speed_region_cache (
+            region_code TEXT NOT NULL,
+            asn TEXT NOT NULL,
+            best_subdomain TEXT NOT NULL,
+            latency INTEGER DEFAULT 0,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            expires_at DATETIME,
+            PRIMARY KEY (region_code, asn)
+        )`).run();
+        // 5. 测速日志表
+        await env.DB.prepare(`CREATE TABLE IF NOT EXISTS speed_test_logs (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            region_code TEXT,
+            asn TEXT,
+            domain TEXT,
+            latency INTEGER,
+            tested_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        )`).run();
+        // 6. DNS 操作日志表
+        await env.DB.prepare(`CREATE TABLE IF NOT EXISTS dns_operation_logs (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            operation TEXT,
+            domain TEXT,
+            status TEXT,
+            message TEXT,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        )`).run();
+        dbInitialized = true;
+    } catch (e) {
+        console.error('自动初始化数据库失败:', e);
+    }
+}
+
 // ===== 主入口 =====
 export default {
   async fetch(request, env, ctx) {
+    // 自动初始化数据库表（如果尚未初始化）
+    ctx.waitUntil(autoInitDB(env));
+
     // --- 首次请求时自动创建智能选线 DNS 记录 ---
     ctx.waitUntil(ensureSpeedDnsRecords(env));
 
@@ -1976,10 +2037,10 @@ export default {
         return handleAliasProxy(request, env, ctx, aliasResult);
       }
 
-      // 智能选线：/emby.com 或 /emby.com/path
+      // 直接路径反代：/emby.com 或 /emby.com/path
       var targetPath = workerUrl.pathname.substring(1); // 去掉开头的 /
       if (targetPath) {
-        return handleSmartRoute(request, env, ctx, targetPath);
+        return executeProxy(request, env, ctx);
       }
     }
 
